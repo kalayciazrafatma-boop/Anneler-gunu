@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canım Annem - Anneler Günü</title>
+
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(to bottom, #ffb6c1, #fff0f5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100-vh;
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none; /* Yazının üzerine tıklanmasını engellemez */
+    }
+
+    /* Mesaj Kutusu */
+    .message {
+        position: relative;
+        background: rgba(255, 255, 255, 0.25);
+        padding: 40px;
+        border-radius: 30px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 10;
+        color: #d1105a;
+        width: 85%;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .message h1 {
+        font-size: 45px;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .message p {
+        font-size: 20px;
+        line-height: 1.6;
+        color: #4a4a4a;
+    }
+
+    /* Çiçekler */
+    .flower {
+        position: absolute;
+        top: -50px;
+        font-size: 24px;
+        animation: fall linear infinite;
+        z-index: 5;
+        user-select: none;
+    }
+
+    @keyframes fall {
+        to {
+            transform: translateY(110vh) rotate(360deg);
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="message">
+    <h1>💖 Canım Annem 💖</h1>
+    <p>
+        Hayatım boyunca yanımda olduğun için teşekkür ederim.<br>
+        Senin sevgin benim en güvenli yerim oldu.<br><br>
+        <strong>İyi ki benim annemsin 🌸</strong><br>
+        Seni çok seviyorum ❤️
+    </p>
+</div>
+
+<canvas id="fireworks"></canvas>
+
+<script>
+/* Çiçek Yağmuru */
+const flowerEmojis = ["🌷", "🌸", "🌹", "🌺", "✨"];
+for(let i=0; i<30; i++){
+    let flower = document.createElement("div");
+    flower.className = "flower";
+    flower.innerHTML = flowerEmojis[Math.floor(Math.random() * flowerEmojis.length)];
+    flower.style.left = Math.random() * 100 + "vw";
+    flower.style.animationDuration = (4 + Math.random() * 6) + "s";
+    flower.style.opacity = Math.random() * 0.8 + 0.2;
+    flower.style.fontSize = (15 + Math.random() * 20) + "px";
+    document.body.appendChild(flower);
+}
+
+/* Havai Fişek Animasyonu */
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+let particles = [];
+
+function createFirework() {
+    // Patlama noktasını ekranın ortasında hafif rastgele yapalım
+    const originX = canvas.width / 2 + (Math.random() * 100 - 50);
+    const originY = canvas.height / 2 + (Math.random() * 100 - 50);
+    
+    const color = `hsl(${Math.random() * 40 + 330}, 100%, 65%)`; // Pembe ve kırmızı tonları
+
+    for(let i=0; i<100; i++) {
+        let t = (i / 100) * Math.PI * 2;
+        // Kalp formülü
+        let x = 16 * Math.pow(Math.sin(t), 3);
+        let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+
+        particles.push({
+            x: originX,
+            y: originY,
+            targetX: x * 15, // Kalbin büyüklüğü
+            targetY: y * 15,
+            velX: (Math.random() - 0.5) * 0.5,
+            velY: (Math.random() - 0.5) * 0.5,
+            alpha: 1,
+            color: color
+        });
+    }
+}
+
+function animate() {
+    // Arka planı temizlerken hafif bir iz bırakır
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach((p, index) => {
+        p.x += p.targetX * 0.05 + p.velX;
+        p.y += p.targetY * 0.05 + p.velY;
+        p.alpha -= 0.01;
+
+        ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        if(p.alpha <= 0) {
+            particles.splice(index, 1);
+        }
+    });
+
+    requestAnimationFrame(animate);
+}
+
+setInterval(createFirework, 1500);
+animate();
+</script>
+
+</body>
+</html>
